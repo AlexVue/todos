@@ -1,30 +1,61 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div class="todos-wrapper">
+    <todo-form @addTodo="addTodo"/>
+    <todo-list
+      :todo-list="todoList"
+      @deleteTodo="deleteTodo"
+      @setDone="setDone"
+    />
   </div>
-  <router-view/>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script lang="ts">
+import TodoForm from '@/components/TodoForm.vue'
+import TodoList from '@/components/TodoList.vue'
+import ITodoItem from '@/types/ITodoItem'
+import { defineComponent, ref } from 'vue'
 
-#nav {
-  padding: 30px;
+export default defineComponent({
+  components: {
+    TodoForm,
+    TodoList
+  },
+  setup () {
+    const todoList = ref<Array<ITodoItem>>([])
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+    const addTodo = (newTodo: ITodoItem): void => {
+      todoList.value.push(newTodo)
+    }
 
-    &.router-link-exact-active {
-      color: #42b983;
+    const deleteTodo = (id: number): void => {
+      todoList.value = todoList.value.filter(item => item.id !== id)
+    }
+
+    const setDone = (id: number): void => {
+      todoList.value.forEach(item => {
+        if (item.id === id) {
+          item.done = !item.done
+        }
+      })
+    }
+
+    return {
+      addTodo,
+      deleteTodo,
+      setDone,
+      todoList
     }
   }
+})
+</script>
+
+<style lang="scss">
+.todos-wrapper {
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 </style>
